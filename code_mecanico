@@ -1,0 +1,90 @@
+SHOW DATABASES;
+CREATE DATABASE svs_mecanicos;
+USE svs_mecanicos;
+
+CREATE TABLE cliente (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50),
+    apellido VARCHAR(50),
+    telefono INT,
+    email VARCHAR(50),
+    direccion VARCHAR(50),
+    CONSTRAINT uk_cliente_email UNIQUE (email)
+);
+
+CREATE TABLE vehiculo (
+    id_vehiculo INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT, 
+    marca VARCHAR(50),
+    modelo VARCHAR(50),
+    anio INT,
+    matricula INT,
+    color VARCHAR(20),
+    CONSTRAINT fk_vehiculo_cliente 
+        FOREIGN KEY (id_cliente) 
+        REFERENCES cliente (id_cliente)
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE mecanico (
+    id_mecanico INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(25),
+    apellido VARCHAR(30),
+    telefono INT,
+    especialidad VARCHAR(50)
+);
+
+CREATE TABLE reparacion (
+    id_reparacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_vehiculo INT,
+    id_mecanico INT,
+    fecha_salida DATE,
+    fecha_entrada DATE,
+    diagnostico VARCHAR(100),
+    estado VARCHAR(20),
+    mano_obra DECIMAL(10,2),
+    CONSTRAINT fk_reparacion_vehiculo 
+        FOREIGN KEY (id_vehiculo) 
+        REFERENCES vehiculo (id_vehiculo),
+    CONSTRAINT fk_reparacion_mecanico 
+        FOREIGN KEY (id_mecanico) 
+        REFERENCES mecanico (id_mecanico)
+);
+
+CREATE TABLE detalle_reparacion (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    id_reparacion INT,
+    descripcion VARCHAR(100),
+    costo DECIMAL(10,2),
+    CONSTRAINT fk_detalle_reparacion 
+        FOREIGN KEY (id_reparacion) 
+        REFERENCES reparacion (id_reparacion)
+);
+
+CREATE TABLE repuestos (
+    id_repuestos INT AUTO_INCREMENT PRIMARY KEY,
+    codigo INT,
+    nombre VARCHAR(25),
+    descripcion VARCHAR(50),
+    precio DECIMAL(10,2),
+    stock INT
+);
+
+CREATE TABLE repuesto_reparacion (
+    id_rep INT AUTO_INCREMENT PRIMARY KEY,
+    id_reparacion INT,
+    id_mecanico INT,
+    id_repuestos INT,
+    cantidad INT,
+    precio_unitario DECIMAL(10,2),
+    CONSTRAINT fk_rr_reparacion 
+        FOREIGN KEY (id_reparacion) 
+        REFERENCES reparacion (id_reparacion),
+    CONSTRAINT fk_rr_mecanico 
+        FOREIGN KEY (id_mecanico) 
+        REFERENCES mecanico (id_mecanico),
+    CONSTRAINT fk_rr_repuestos 
+        FOREIGN KEY (id_repuestos) 
+        REFERENCES repuestos (id_repuestos)
+);
